@@ -15,7 +15,7 @@ turtle.setup (width=800, height=800, startx=0, starty=0)
 turtle.bgcolor("black")
 turtle.ht()
 turtle.setundobuffer(1)
-turtle.tracer(1)
+turtle.tracer(2)
 
 class Sprite(turtle.Turtle):
    def __init__(self, spriteshape, color, startx, starty):
@@ -148,7 +148,7 @@ class Game():
    def __init__(self):
        self.level = 1
        self.score = 0
-       self.state = "playing"
+       self.state = True
        self.pen = turtle.Turtle()
        self.lives = 3
 
@@ -175,8 +175,10 @@ class Game():
        self.pen.write(msg, font=("Arial", 16, "normal"))
 
    def pause(self):
-       self.pen.up()
-       self.status = True
+       if self.state == True:
+           self.state =  False
+       else:
+           self.state = True
 
 
 
@@ -189,12 +191,11 @@ game.draw_border()
 #Show game score
 game.show_status()
 
-#Game Pause
-game.pause()
+
 
 #Create my sprites
 player = Player("triangle", "white", 0,0)
-pause = Pause("Square", "grey", -300,300)
+
 pickup = Pickup("turtle", "green", 100,0)
 enemies = []
 for i in range(6):
@@ -216,67 +217,68 @@ turtle.onkey(player.turn_right, "d")
 turtle.onkey(player.accelerate, "w")
 turtle.onkey(player.decelerate, "s")
 turtle.onkey(missile.fire, "space")
-turtle.onkey(pause, "p")
+turtle.onkey(game.pause, "p")
 
 #Game Loop
 while True:
-   pause = True
-   player.move()
-   missile.move()
+    if game.state:
+       player.move()
+       missile.move()
 
 
-   for enemy in enemies:
-       enemy.move()
+       for enemy in enemies:
+           enemy.move()
 
-       #Check for a collision with the player
-       if player.is_collision(enemy):
-           x = random.randint(-250, 250)
-           y = random.randint(-250, 250)
-           enemy.goto(x, y)
-           # Decrease the score
-           game.score -= 50
-           game.show_status()
+           #Check for a collision with the player
+           if player.is_collision(enemy):
+               x = random.randint(-250, 250)
+               y = random.randint(-250, 250)
+               enemy.goto(x, y)
+               # Decrease the score
+               game.score -= 50
+               game.show_status()
 
-       if player.is_collision(pickup):
-           x = random.randint(-250, 250)
-           y = random.randint(-250, 250)
-           pickup.goto(x, y)
-           allies.append(Ally("square", "orange", 0,0,))
-
-
-
-       #Check fo a collision between the missile and the enemy
-       if missile.is_collision(enemy):
-           x = random.randint(-250, 250)
-           y = random.randint(-250, 250)
-           enemy.goto(x, y)
-           #Increase the score
-           game.score += 100
-           game.show_status()
-
-   for ally in allies:
-       ally.move()
-
-       if missile.is_collision(ally):
-           x = random.randint(-250, 250)
-           y = random.randint(-250, 250)
-           ally.goto(x, y)
-           missile.status = "ready"
-           #Decrease the score
-           game.score -= 50
-           game.show_status()
-
-       if player.is_collision(ally):
-           # Decrease the score
-           game.score -= 50
-           game.show_status()
-
-       if ally.is_collision(enemy):
-           x = random.randint(-250, 250)
-           y = random.randint(-250, 250)
-           enemy.goto(x,y)
-           #Increase the score
-           game.score+=50
-           game.show_status()
+           if player.is_collision(pickup):
+               x = random.randint(-250, 250)
+               y = random.randint(-250, 250)
+               pickup.goto(x, y)
+               allies.append(Ally("square", "orange", 0,0,))
 
 
+
+           #Check fo a collision between the missile and the enemy
+           if missile.is_collision(enemy):
+               x = random.randint(-250, 250)
+               y = random.randint(-250, 250)
+               enemy.goto(x, y)
+               #Increase the score
+               game.score += 100
+               game.show_status()
+
+       for ally in allies:
+           ally.move()
+
+           if missile.is_collision(ally):
+               x = random.randint(-250, 250)
+               y = random.randint(-250, 250)
+               ally.goto(x, y)
+               missile.status = "ready"
+               #Decrease the score
+               game.score -= 50
+               game.show_status()
+
+           if player.is_collision(ally):
+               # Decrease the score
+               game.score -= 50
+               game.show_status()
+
+           if ally.is_collision(enemy):
+               x = random.randint(-250, 250)
+               y = random.randint(-250, 250)
+               enemy.goto(x,y)
+               #Increase the score
+               game.score+=50
+               game.show_status()
+
+    else:
+        pass
